@@ -93,6 +93,7 @@ for _ in range(args.permutations):
             ('NB', GaussianNB()),
             ('SVM_l', SVC(kernel='linear')),
             ('SVM_rbf', SVC(kernel='rbf')),
+            ('SVM_poly', SVC(kernel='poly')),
             ('kNN', KNeighborsClassifier(n_neighbors=6, metric='cosine')),
             ('DT', DecisionTreeClassifier()),
             ('DF', RandomForestClassifier(n_estimators=100)),
