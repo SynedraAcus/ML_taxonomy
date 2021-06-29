@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from classify_functions import *
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis,\
     QuadraticDiscriminantAnalysis
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
@@ -15,7 +15,7 @@ from sklearn.metrics import accuracy_score, adjusted_mutual_info_score
 parser = ArgumentParser()
 parser.add_argument('-t', type=str, help='Morphometric data')
 parser.add_argument('--classifier', type=str, help='Classifier type')
-# Valid values are: 'kNN', 'NB', 'SVM', 'DT'
+# Valid values are: 'kNN', 'NB', 'SVM', 'DT', 'DF', 'LDA', 'QDA' or 'ensemble'
 parser.add_argument('--training_set', type=float, default=0.75,
                     help='Relative size of training set')
 parser.add_argument('--permutations', type=int, default='10',
@@ -88,6 +88,25 @@ for _ in range(args.permutations):
     elif args.classifier == 'QDA':
         classifier = QuadraticDiscriminantAnalysis()
         big_classifier = QuadraticDiscriminantAnalysis()
+    elif args.classifier == 'ensemble':
+        classifier = VotingClassifier(estimators=[
+            ('NB', GaussianNB()),
+            ('SVM_l', SVC(kernel='linear')),
+            ('SVM_rbf', SVC(kernel='rbf')),
+            ('kNN', KNeighborsClassifier(n_neighbors=6, metric='cosine')),
+            ('DT', DecisionTreeClassifier()),
+            ('DF', RandomForestClassifier(n_estimators=100)),
+            ('LDA', LinearDiscriminantAnalysis())
+            ], n_jobs=3)
+        big_classifier = VotingClassifier(estimators=[
+            ('NB', GaussianNB()),
+            ('SVM_l', SVC(kernel='linear')),
+            ('SVM_rbf', SVC(kernel='rbf')),
+            ('kNN', KNeighborsClassifier(n_neighbors=6, metric='cosine')),
+            ('DT', DecisionTreeClassifier()),
+            ('DF', RandomForestClassifier(n_estimators=100)),
+            ('LDA', LinearDiscriminantAnalysis())
+        ], n_jobs=3)
     classifier.fit(training_data, training_labels)
     classified_labels = classifier.predict(testing_data)
     # Estimating accuracy and mutual info on training/testing sets
