@@ -14,7 +14,7 @@ args = parser.parse_args()
 
 # Loading reference data
 data, strains = morpho_data(args.t,
-                            use_fields=(5,6,7,8,9,10,11),
+                            data_fields=(5, 6, 7, 8, 9, 10, 11),
                             scale_data=False)
 strain_to_clade = clade_dict()
 labels = [strain_to_clade[x] for x in strains]
@@ -27,7 +27,7 @@ knn.fit(claded_data, claded_labels)
 
 # Loading sample data
 data, plates = morpho_data(args.s,
-                           use_fields=(2, 3, 4, 5, 6, 7, 8),
+                           data_fields=(2, 3, 4, 5, 6, 7, 8),
                            scale_data=False)
 by_plate = defaultdict(list)
 for i in range(len(plates)):

@@ -28,16 +28,21 @@ def clade_dict():
     return clades
 
 
-def morpho_data(infile, use_fields=(5,6,7,8,9,10,11,12), scale_data=True):
+def morpho_data(infile, strain_field=1,
+                data_fields=None, scale_data=True):
     data = []
     for line in open(infile):
         if line[0] != '#':
             a = line.rstrip().split('\t')
             data.append(a)
-    data_array = np.asarray([[float(x[i]) for i in use_fields] for x in data])
+    if not data_fields:
+        # If data fields are not set explicitly, use all columns
+        # after strain_field.
+        data_fields = [x for x in range(strain_field + 1, len(data[0]))]
+    data_array = np.asarray([[float(x[i]) for i in data_fields] for x in data])
     if scale_data:
         data_array = scale(data_array)
-    strains = [x[1] for x in data]
+    strains = [x[strain_field] for x in data]
     return data_array, strains
 
 
